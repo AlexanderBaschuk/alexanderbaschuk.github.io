@@ -40596,7 +40596,7 @@ function* loadResults(action) {
 
 function* mainSaga() {
   yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["takeLatest"])([_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsRequest"]], loadResults);
-  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsRequest"])("/results/testFeis.json"));
+  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsRequest"])("./results/testFeis.json"));
 }
 
 /***/ }),
