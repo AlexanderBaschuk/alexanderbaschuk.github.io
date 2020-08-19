@@ -39380,19 +39380,23 @@ module.exports = function(originalModule) {
 /*!************************!*\
   !*** ./src/actions.ts ***!
   \************************/
-/*! exports provided: initResults, calculate, toggleAdjudicator, toggleRound, toggleCompetitor */
+/*! exports provided: initResultsRequest, initResultsSuccess, initResultsFailure, calculate, toggleAdjudicator, toggleRound, toggleCompetitor */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initResults", function() { return initResults; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initResultsRequest", function() { return initResultsRequest; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initResultsSuccess", function() { return initResultsSuccess; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initResultsFailure", function() { return initResultsFailure; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculate", function() { return calculate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toggleAdjudicator", function() { return toggleAdjudicator; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toggleRound", function() { return toggleRound; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toggleCompetitor", function() { return toggleCompetitor; });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.esm.js");
 
-const initResults = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("INIT_RESULTS");
+const initResultsRequest = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("INIT_RESULTS_REQUEST");
+const initResultsSuccess = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("INIT_RESULTS_SUCCESS");
+const initResultsFailure = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("INIT_RESULTS_FAILURE");
 const calculate = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("CALCULATE");
 const toggleAdjudicator = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("TOGGLE_ADJUDICATOR");
 const toggleRound = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__["createAction"])("TOGGLE_ROUND");
@@ -40108,6 +40112,7 @@ __webpack_require__.r(__webpack_exports__);
 const Scorrz = () => {
   const dispatch = Object(react_redux__WEBPACK_IMPORTED_MODULE_3__["useDispatch"])();
   const isLoading = Object(react_redux__WEBPACK_IMPORTED_MODULE_3__["useSelector"])(_selectors__WEBPACK_IMPORTED_MODULE_1__["loadingSelector"]);
+  const errorMessage = Object(react_redux__WEBPACK_IMPORTED_MODULE_3__["useSelector"])(_selectors__WEBPACK_IMPORTED_MODULE_1__["errorMessageSelector"]);
   const eventTitle = Object(react_redux__WEBPACK_IMPORTED_MODULE_3__["useSelector"])(_selectors__WEBPACK_IMPORTED_MODULE_1__["eventTitleSelector"]);
   const competitionTitle = Object(react_redux__WEBPACK_IMPORTED_MODULE_3__["useSelector"])(_selectors__WEBPACK_IMPORTED_MODULE_1__["competitionTitleSelector"]);
   const adjudicators = Object(react_redux__WEBPACK_IMPORTED_MODULE_3__["useSelector"])(_selectors__WEBPACK_IMPORTED_MODULE_1__["adjudicatorsSelector"]);
@@ -40130,7 +40135,16 @@ const Scorrz = () => {
   const clickCompetitorRow = Object(react__WEBPACK_IMPORTED_MODULE_0__["useCallback"])(id => {
     dispatch(Object(_actions__WEBPACK_IMPORTED_MODULE_2__["toggleCompetitor"])(id));
   }, [dispatch]);
-  return isLoading ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Loading...") : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Scorrz_styles__WEBPACK_IMPORTED_MODULE_9__["ScorrzStyled"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CompetitionTitle_CompetitionPageTitle__WEBPACK_IMPORTED_MODULE_6__["CompetitionPageTitle"], {
+
+  if (isLoading) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Loading...");
+  }
+
+  if (errorMessage !== undefined) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, errorMessage);
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Scorrz_styles__WEBPACK_IMPORTED_MODULE_9__["ScorrzStyled"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CompetitionTitle_CompetitionPageTitle__WEBPACK_IMPORTED_MODULE_6__["CompetitionPageTitle"], {
     eventTitle: eventTitle,
     competitionTitle: competitionTitle
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AdjudicatorSelection_AdjudicatorSelection__WEBPACK_IMPORTED_MODULE_4__["AdjudicatorSelection"], {
@@ -40502,9 +40516,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const reducer = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_3__["createReducer"])(_types__WEBPACK_IMPORTED_MODULE_0__["initialState"], {
-  [_actions__WEBPACK_IMPORTED_MODULE_1__["initResults"].type]: (_, action) => {
+  [_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsRequest"].type]: state => {
+    state.isLoading = true;
+    return state;
+  },
+  [_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsSuccess"].type]: (_, action) => {
     const state = Object(_helpers_initState__WEBPACK_IMPORTED_MODULE_4__["initStateFromDto"])(action.payload);
     return calculateState(state);
+  },
+  [_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsFailure"].type]: (state, action) => {
+    state.isLoading = false;
+    state.errorMessage = action.payload;
+    return state;
   },
   [_actions__WEBPACK_IMPORTED_MODULE_1__["calculate"].type]: state => {
     return calculateState(state);
@@ -40550,19 +40573,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mainSaga", function() { return mainSaga; });
 /* harmony import */ var redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! redux-saga/effects */ "./node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
 /* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./actions */ "./src/actions.ts");
-/* harmony import */ var _testResultsDto__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./testResultsDto */ "./src/testResultsDto.ts");
 
 
 
+function* loadResults(action) {
+  const response = yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["call"])(fetch, action.payload);
 
-function* loadResults() {
-  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["delay"])(1000); // Just for presentation purposes
-
-  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResults"])(_testResultsDto__WEBPACK_IMPORTED_MODULE_2__["testResultsDto"]));
+  try {
+    if (response.ok) {
+      const resultsDto = yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["call"])([response, response.json]);
+      yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsSuccess"])(resultsDto));
+    } else {
+      const message = "HTTP error: " + response.status;
+      console.error(message);
+      yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsFailure"])(message));
+    }
+  } catch (error) {
+    console.error(error);
+    yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsFailure"])(error.message));
+  }
 }
 
 function* mainSaga() {
-  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["call"])(loadResults);
+  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["takeLatest"])([_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsRequest"]], loadResults);
+  yield Object(redux_saga_effects__WEBPACK_IMPORTED_MODULE_0__["put"])(Object(_actions__WEBPACK_IMPORTED_MODULE_1__["initResultsRequest"])("/results/testFeis.json"));
 }
 
 /***/ }),
@@ -40571,12 +40605,13 @@ function* mainSaga() {
 /*!**************************!*\
   !*** ./src/selectors.ts ***!
   \**************************/
-/*! exports provided: loadingSelector, eventTitleSelector, competitionTitleSelector, adjudicatorsSelector, roundsNamesSelector, allResultsSelector, competitorsSelector, selectedAdjudicatorsSelector, selectedRoundsSelector, adjudicatorTablesSelector, finalTableSelector, selectedCompetitorsSelector */
+/*! exports provided: loadingSelector, errorMessageSelector, eventTitleSelector, competitionTitleSelector, adjudicatorsSelector, roundsNamesSelector, allResultsSelector, competitorsSelector, selectedAdjudicatorsSelector, selectedRoundsSelector, adjudicatorTablesSelector, finalTableSelector, selectedCompetitorsSelector */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadingSelector", function() { return loadingSelector; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "errorMessageSelector", function() { return errorMessageSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "eventTitleSelector", function() { return eventTitleSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "competitionTitleSelector", function() { return competitionTitleSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "adjudicatorsSelector", function() { return adjudicatorsSelector; });
@@ -40589,6 +40624,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "finalTableSelector", function() { return finalTableSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "selectedCompetitorsSelector", function() { return selectedCompetitorsSelector; });
 const loadingSelector = state => state.isLoading;
+const errorMessageSelector = state => state.errorMessage;
 const eventTitleSelector = state => state.eventTitle;
 const competitionTitleSelector = state => state.competitionTitle;
 const adjudicatorsSelector = state => state.results.map(results => results.adjudicatorName);
@@ -40600,117 +40636,6 @@ const selectedRoundsSelector = state => state.selectedRounds;
 const adjudicatorTablesSelector = state => state.adjudicatorTables;
 const finalTableSelector = state => state.finalTable;
 const selectedCompetitorsSelector = state => state.selectedCompetitors;
-
-/***/ }),
-
-/***/ "./src/testResultsDto.ts":
-/*!*******************************!*\
-  !*** ./src/testResultsDto.ts ***!
-  \*******************************/
-/*! exports provided: testResultsDto */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testResultsDto", function() { return testResultsDto; });
-const testResultsDto = {
-  eventTitle: "Moscow Feis 2020",
-  competitionTitle: "Preliminary championship, 15-20 yeas",
-  rounds: [{
-    name: "Heavy",
-    shortName: "H"
-  }, {
-    name: "Light",
-    shortName: "L"
-  }, {
-    name: "Set",
-    shortName: "S"
-  }],
-  competitors: [{
-    id: "10",
-    name: "Sasha",
-    school: "SchoolName"
-  }, {
-    id: "120",
-    name: "John",
-    school: "SchoolName"
-  }, {
-    id: "230",
-    name: "Paul",
-    school: "SchoolName"
-  }, {
-    id: "340",
-    name: "Mike",
-    school: "SchoolName"
-  }, {
-    id: "450",
-    name: "Sandra",
-    school: "SchoolName"
-  }, {
-    id: "560",
-    name: "Laura",
-    school: "SchoolName"
-  }, {
-    id: "670",
-    name: "Alex",
-    school: "SchoolName"
-  }],
-  results: [{
-    adjudicatorName: "Brendan O'Brian",
-    resultLines: [{
-      competitorId: "10",
-      score: [74, 82, 77]
-    }, {
-      competitorId: "120",
-      score: [82, 75, 77]
-    }, {
-      competitorId: "560",
-      score: [77, 82, 74]
-    }, {
-      competitorId: "340",
-      score: [74, 77, 82]
-    }, {
-      competitorId: "670",
-      score: [82, 77, 75]
-    }, {
-      competitorId: "230",
-      score: [77, 75, 82]
-    }]
-  }, {
-    adjudicatorName: "Mary McElroy",
-    resultLines: [{
-      competitorId: "10",
-      score: [74, 82, 77]
-    }, {
-      competitorId: "120",
-      score: [82, 74, 77]
-    }, {
-      competitorId: "560",
-      score: [77, 82, 74]
-    }, {
-      competitorId: "230",
-      score: [74, 77, 82]
-    }, {
-      competitorId: "340",
-      score: [82, 77, 74]
-    }]
-  }, {
-    adjudicatorName: "John Cullinane",
-    resultLines: [{
-      competitorId: "10",
-      score: [74, 82, 77]
-    }, {
-      competitorId: "230",
-      score: [74, 77, 82]
-    }, {
-      competitorId: "670",
-      score: [82, 77, 75]
-    }, {
-      competitorId: "340",
-      score: [82, 77, 74]
-    }]
-  }]
-};
 
 /***/ }),
 
